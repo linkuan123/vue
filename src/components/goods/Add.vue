@@ -56,11 +56,28 @@
           </el-tab-pane>
           <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
           <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
-          <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
+          <el-tab-pane label="商品图片" name="3">
+            <!-- action 表示图片要上传到的后台API地址 -->
+            <el-upload
+              :action="uploadURL"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              list-type="picture"
+              :headers="headerObj"
+              :on-success="handleSuccess"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+
+    <!-- 图片预览 -->
+    <el-dialog title="图片预览" :visible.sync="previewVisible" width="50%">
+      <img :src="previewPath" alt class="previewImg" />
+    </el-dialog>
   </div>
 </template>
 
@@ -74,7 +91,9 @@ export default {
         goods_name: '',
         goods_price: 0,
         // 商品所属的分类数组
-        goods_cat: []
+        goods_cat: [],
+        // 图片的数组
+        pics: []
       },
       addFormRules: {
         goods_name: [
@@ -89,7 +108,15 @@ export default {
       },
       // 商品分类列表
       catelist: [],
-      cateProps: { label: 'cat_name', value: 'cat_id', children: 'children' }
+      cateProps: { label: 'cat_name', value: 'cat_id', children: 'children' },
+      // 上传图片的URL地址
+      uploadURL: 'https://www.liulongbin.top:8888/api/private/v1/upload',
+      // 图片上传组件的headers请求头对象
+      headerObj: {
+        Authorization: window.sessionStorage.getItem('token')
+      },
+      previewPath: '',
+      previewVisible: false
     }
   },
   created() {
@@ -111,7 +138,7 @@ export default {
       console.log('即将离开的标签页名字是：' + oldActiveName)
       console.log('即将进入的标签页名字是：' + activeName)
       // return false
-
+      // 判断是否跳可以跳转到第二步：商品分类是否选择了三级分类
       // if (oldActiveName === '0' && this.addForm.goods_cat.length !== 3) {
       //   this.$message.error('请先选择商品分类！')
       //   return false
@@ -125,6 +152,32 @@ export default {
       if (this.addForm.goods_cat.length !== 3) {
         this.addForm.goods_cat = []
       }
+    },
+    // 处理图片预览效果
+    handlePreview(file) {
+      console.log(file)
+      this.previewPath = file.response.data.url
+      this.previewVisible = true
+    },
+    // 处理移除图片的操作
+    handleRemove(file) {
+      // console.log(file)
+      // 1. 获取将要删除的图片的临时路径
+      const filePath = file.response.data.tmp_path
+      // 2. 从 pics 数组中，找到这个图片对应的索引值
+      const i = this.addForm.pics.findIndex(x => x.pic === filePath)
+      // 3. 调用数组的 splice 方法，把图片信息对象，从 pics 数组中移除
+      this.addForm.pics.splice(i, 1)
+      console.log(this.addForm)
+    },
+    // 监听图片上传成功的事件
+    handleSuccess(response) {
+      console.log(response)
+      // 1. 拼接得到一个图片信息对象,API需要pic属性
+      const picInfo = { pic: response.data.tmp_path }
+      // 2. 将图片信息对象，push 到pics数组中
+      this.addForm.pics.push(picInfo)
+      console.log(this.addForm)
     }
   }
 }
@@ -133,5 +186,13 @@ export default {
 <style lang="less" scoped>
 .el-checkbox {
   margin: 0 10px 0 0 !important;
+}
+
+.previewImg {
+  width: 100%;
+}
+
+.btnAdd {
+  margin-top: 15px;
 }
 </style>
