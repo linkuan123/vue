@@ -7,6 +7,14 @@ import './plugins/iview.js'
 import './assets/fonts/iconfont.css'
 // 导入全局样式表
 import './assets/css/global.css'
+
+// 导入富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+// require styles 导入富文本编辑器对应的样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
 // 用于发送ajax
 import axios from 'axios'
 // 配置请求的跟路径
@@ -21,5 +29,8 @@ axios.interceptors.request.use(config => {
 Vue.prototype.$http = axios
 
 Vue.config.productionTip = false
+
+// 将富文本编辑器，注册为全局可用的组件
+Vue.use(VueQuillEditor)
 
 new Vue({ router, render: h => h(App) }).$mount('#app')
