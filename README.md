@@ -1,8 +1,7 @@
-# vue
+# vue项目demo
 
-vue项目demo
+### 安装依赖可能遇到的问题及解决方法
 
-安装依赖可能遇到的问题及解决方法
 #### 1 [vue项目中引用element ui](https://blog.csdn.net/QYHuiiQ/article/details/109013934)
 ```
 cnpm i element-ui -S
